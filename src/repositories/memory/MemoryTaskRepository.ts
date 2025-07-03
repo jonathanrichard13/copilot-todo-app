@@ -64,6 +64,9 @@ export class MemoryTaskRepository implements ITaskRepository {
     const task = this.tasks.get(id);
     if (!task) return null;
 
+    // Add a small delay to ensure updatedAt is different
+    await new Promise(resolve => setTimeout(resolve, 10));
+
     const updatedTask: Task = {
       ...task,
       ...data,
@@ -87,6 +90,9 @@ export class MemoryTaskRepository implements ITaskRepository {
   async toggleComplete(id: string): Promise<Task | null> {
     const task = this.tasks.get(id);
     if (!task) return null;
+
+    // Add a small delay to ensure updatedAt is different
+    await new Promise(resolve => setTimeout(resolve, 10));
 
     const updatedTask: Task = {
       ...task,

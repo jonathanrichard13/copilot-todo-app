@@ -20,6 +20,7 @@ export class MemoryListRepository implements IListRepository {
       description: data.description || null,
       createdAt: new Date(),
       updatedAt: new Date(),
+      tasks: [], // Initialize empty tasks array
     };
 
     this.lists.set(list.id, list);
@@ -30,7 +31,11 @@ export class MemoryListRepository implements IListRepository {
    * Get all lists
    */
   async findAll(): Promise<List[]> {
-    return Array.from(this.lists.values());
+    const lists = Array.from(this.lists.values());
+    return lists.map(list => ({
+      ...list,
+      tasks: Array.from(this.tasks.values()).filter(task => task.listId === list.id)
+    }));
   }
 
   /**
@@ -48,7 +53,13 @@ export class MemoryListRepository implements IListRepository {
    * Get a list by ID
    */
   async findById(id: string): Promise<List | null> {
-    return this.lists.get(id) || null;
+    const list = this.lists.get(id);
+    if (!list) return null;
+
+    return {
+      ...list,
+      tasks: Array.from(this.tasks.values()).filter(task => task.listId === id)
+    };
   }
 
   /**
@@ -71,10 +82,14 @@ export class MemoryListRepository implements IListRepository {
     const list = this.lists.get(id);
     if (!list) return null;
 
+    // Add a small delay to ensure updatedAt is different
+    await new Promise(resolve => setTimeout(resolve, 10));
+
     const updatedList: List = {
       ...list,
       ...data,
       updatedAt: new Date(),
+      tasks: Array.from(this.tasks.values()).filter(task => task.listId === id)
     };
 
     this.lists.set(id, updatedList);
